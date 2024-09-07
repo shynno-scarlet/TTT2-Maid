@@ -1,1 +1,4 @@
-TODO: ReadMe
+TODO: 
+- ReadMe
+- DE Translation
+- Testing
