@@ -1,0 +1,6 @@
+{
+	"title"		:	"[TTT2] Maid [ROLE]",
+	"type"		:	"ServerContent",
+    "tags"		:	[ "roleplay", "fun" ],
+    "ignore"    : [".git/*", ".README.md"]
+}
