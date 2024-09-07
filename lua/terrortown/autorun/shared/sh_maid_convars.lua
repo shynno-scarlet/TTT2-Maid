@@ -10,6 +10,8 @@ MAID_CVARS = {
 	ttt2_maid_ability_cooldown = {10, 90, 300},
 	ttt2_maid_refund_credits = false,
 	ttt2_maid_is_public_role = true,
+	ttt2_maid_throw_knife_damage = {1,3,100},
+	ttt2_maid_throw_knife_speed = {1,4,10},
 }
 
 for var, val in pairs(MAID_CVARS) do

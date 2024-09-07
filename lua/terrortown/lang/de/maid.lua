@@ -28,3 +28,6 @@ L["label_ttt2_maid_poison_time_max"] = "Maximum time to poison kill (Defective M
 L["label_ttt2_maid_heal_amount"] = "The amount one meal can heal"
 L["label_ttt2_maid_ability_cooldown"] = "The cooldown of the maids abilities"
 L["label_ttt2_maid_refund_credits"] = "Refund credits if the maid was already hired"
+L["label_ttt2_maid_is_public_role"] = "Is the role shown to everyone?"
+L["label_ttt2_maid_throw_knife_damage"] = "Damage dealt when a throwing knife hits"
+L["label_ttt2_maid_throw_knife_speed"] = "How fast can the knives be thrown (knives per second)"
