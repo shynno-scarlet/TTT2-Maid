@@ -5,18 +5,17 @@ end
 
 roles.InitCustomTeam(ROLE.name, {
 	icon = "vgui/ttt/dynamic/roles/icon_maid",
-	color = Color(101, 82, 180)
+	color = Color(101, 82, 180, 255)
 })
 
 function ROLE:PreInitialize()
-	self.color = Color(101, 82, 180)
+	self.color = Color(101, 82, 180, 255)
 	self.abbr = "maid"
 	self.surviveBonus = 0
 	self.score.killsMultiplier = 1
 	self.score.teamKillsMultiplier = -1
 	self.defaultEquipment = SPECIAL_EQUIPMENT
 	self.defaultTeam = TEAM_NONE
-	self.isPublicRole = GetConVar("ttt2_maid_is_public_role"):GetBool()
 	self.conVarData = {
 		pct		  = 0.15, -- necessary: percentage of getting this role selected (per player)
 		maximum	  = 1, -- maximum amount of roles in a round
@@ -49,6 +48,7 @@ if SERVER then
 	end)
 
 	function ROLE:GiveRoleLoadout(ply, isRoleChange)
+		ply:GetSubRoleData().isPublicRole = GetConVar("ttt2_maid_is_public_role"):GetBool()
 		if not isRoleChange then return end
 		ply:GiveEquipmentWeapon("weapon_ttt_maid_knife")
 	end
