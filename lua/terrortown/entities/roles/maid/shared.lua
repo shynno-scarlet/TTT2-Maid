@@ -54,24 +54,22 @@ if SERVER then
 	end
 end
 
-if CLIENT then
-	function ROLE:AddToSettingsMenu(parent)
-		local form = vgui.CreateTTT2Form(parent, "header_roles_additional")
-		for var, val in pairs(MAID_CVARS) do
-			if type(var) == "boolean" then
-				form:MakeCheckBox({
-					serverConvar = tostring(var),
-					label = "label_" .. tostring(var)
-				})
-			else
-				form:MakeSlider({
-					serverConvar = tostring(var),
-					label = "label_" .. tostring(var),
-					min = val[1],
-					max = val[3],
-					decimal = 0
-				})
-			end
+function ROLE:AddToSettingsMenu(parent)
+	local form = vgui.CreateTTT2Form(parent, "header_roles_additional")
+	for var, val in pairs(MAID_CVARS) do
+		if type(val[2]) == "boolean" then
+			form:MakeCheckBox({
+				serverConvar = tostring(var),
+				label = "label_" .. tostring(var)
+			})
+		else
+			form:MakeSlider({
+				serverConvar = tostring(var),
+				label = "label_" .. tostring(var),
+				min = val[1],
+				max = val[3],
+				decimal = 0
+			})
 		end
 	end
 end
