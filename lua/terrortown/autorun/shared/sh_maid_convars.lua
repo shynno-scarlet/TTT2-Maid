@@ -14,8 +14,23 @@ MAID_CVARS = {
 	["ttt2_maid_throw_knife_speed"] = {1,4,10},
 }
 
+local function str(val)
+	if type(val) == "boolean" then
+		if val then
+			val = 1
+		else
+			val = 0
+		end
+	end
+	return tostring(val)
+end
+
+local function desc(var, def)
+	return var .. " (def. " .. tostring(def) .. ")"
+end
+
 for var, val in pairs(MAID_CVARS) do
-	CreateConVar(var, val[2], {FCVAR_NOTIFY, FCVAR_ARCHIVE})
+	CreateConVar(var, str(val[2]), {FCVAR_NOTIFY, FCVAR_ARCHIVE}, desc(var, val[2]), val[1], val[3])
 end
 
 hook.Add("TTTUlxDynamicRCVars", "ttt2_ulx_maid_cvars", function(tbl)
@@ -29,7 +44,7 @@ hook.Add("TTTUlxDynamicRCVars", "ttt2_ulx_maid_cvars", function(tbl)
 			checkbox = type(val[2]) == "boolean",
 			slider = type(val[2]) == "number",
 			decimal = 0,
-			desc = var .. " (def. " .. tostring(val[2]) .. ")"
+			desc = desc(var, val[2])
 		})
 	end
 end)
