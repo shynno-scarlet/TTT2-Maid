@@ -15,17 +15,20 @@ MAID_CVARS = {
 }
 
 for var, val in pairs(MAID_CVARS) do
+	if type(val) == "table" then
+		val = val[2]
+	end
 	CreateConVar(var, val[2], {FCVAR_NOTIFY, FCVAR_ARCHIVE})
 end
 
 hook.Add("TTTUlxDynamicRCVars", "ttt2_ulx_maid_cvars", function(tbl)
 	tbl[ROLE_MAID] = tbl[ROLE_MAID] or {}
 
-	for var, val in pairs(cvrs) do
-	table.insert(tbl[ROLE_MAID], {
-		cvar = var,
-		checkbox = type(var) == "boolean",
-		desc = var .. " (def. " .. tostring(val[2]) .. ")"
-	})
+	for var, val in pairs(MAID_CVARS) do
+		table.insert(tbl[ROLE_MAID], {
+			cvar = var,
+			checkbox = type(var) == "boolean",
+			desc = var .. " (def. " .. tostring(val[2]) .. ")"
+		})
 	end
 end)
