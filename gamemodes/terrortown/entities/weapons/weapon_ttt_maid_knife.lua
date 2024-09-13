@@ -120,8 +120,13 @@ function SWEP:SecondaryAttack()
 end
 
 function SWEP:ThrowKnife()
-	local mdl = "models/weapons/cstrike/c_knife_t.mdl"
+	local mdl = "models/weapons/w_knife_t.mdl"
 	local owner = self:GetOwner()
+	if (not owner) or (not owner:IsValid()) then return end
+
+	-- client
+	self:EmitSound(self.ShootSound, 75, 150)
+	if CLIENT then return end
 
 	local view = owner:GetAimVector()
 	local pos = view * 16
@@ -147,7 +152,6 @@ function SWEP:ThrowKnife()
 	view:Mul(1000)
 	view:Add(VectorRand(-100, 100))
 	phys:ApplyForceCenter(view)
-	self:EmitSound(self.ShootSound, 75, 150)
 
 	-- despawn after 20 sec
 	timer.Simple(20, function()
