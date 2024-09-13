@@ -49,7 +49,9 @@ SWEP.HitDistance = 512
 SWEP.AllowDrop = false
 SWEP.IsSilent = true
 SWEP.ShootSound = Sound("Metal.SawbladeStick")
-SWEP.ThrowingDmg = GetConVar("ttt2_maid_throw_knife_damage"):GetInt()
+SWEP.ThrowingDmg = GetConVar("ttt2_maid_throw_knife_damage")
+SWEP.AngleVelocity = GetConVar("ttt2_maid_throw_angle_velocity")
+SWEP.ThrowVelocity = GetConVar("ttt2_maid_throw_velocity")
 
 -- Pull out faster than standard guns
 SWEP.DeploySpeed = 5
@@ -129,6 +131,9 @@ function SWEP:ThrowKnife()
 	if CLIENT then return end
 
 	local view = owner:GetAimVector()
+	local cross = view:Cross(vector_up)
+	cross:Normalize()
+	cross:Mul(self.AngleVelocity:GetInt())
 	local pos = view * 16
 	pos:Add(owner:EyePos())
 
@@ -137,21 +142,34 @@ function SWEP:ThrowKnife()
 	ent.maid_throwing_knife = true
 	ent:SetModel(mdl)
 	ent:SetPos(pos)
-	ent:SetAngles(owner:EyeAngles())
+	local angle = owner:EyeAngles()
+	angle.pitch = angle.pitch + 80
+	ent:SetAngles(angle)
 	ent:Spawn()
-	local cb = ent:AddCallback("PhysicsCollide", function(collider, data)
-		local hit_ent = data.HitEntity
-		if hit_ent and hit_ent:IsValid() and hit_ent:IsPlayer() then
-			hit_ent:TakeDamage(self.ThrowingDmg, owner, self)
-		end
-		ent:RemoveCallback(cb)
-	end)
 
 	-- launch ent
 	local phys = ent:GetPhysicsObject()
-	view:Mul(1000)
-	view:Add(VectorRand(-100, 100))
+	view:Mul(self.ThrowVelocity:GetInt())
+	view:Add(VectorRand(-10, 10))
 	phys:ApplyForceCenter(view)
+	phys:AddGameFlag(64)
+	phys:AddGameFlag(1)
+	phys:EnableCollisions(true)
+	phys:SetBuoyancyRatio(1)
+	phys:SetContents(1)
+	phys:SetAngleDragCoefficient(0.001)
+	phys:SetAngleVelocity(cross)
+
+	-- ply dmg
+	ent:AddCallback("PhysicsCollide", function(collider, data)
+		local hit_ent = data.HitEntity
+		if hit_ent and hit_ent:IsValid() and hit_ent:IsPlayer() and (not ent:OnGround()) then
+			hit_ent:TakeDamage(self.ThrowingDmg:GetInt(), owner, self)
+			if ent:Isvalid() then
+				ent:Remove()
+			end
+		end
+	end)
 
 	-- despawn after 20 sec
 	timer.Simple(20, function()

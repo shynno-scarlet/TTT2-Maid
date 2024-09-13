@@ -31,3 +31,5 @@ L["label_ttt2_maid_refund_credits"] = "Refund credits if the maid was already hi
 L["label_ttt2_maid_is_public_role"] = "Is the role shown to everyone?"
 L["label_ttt2_maid_throw_knife_damage"] = "Damage dealt when a throwing knife hits"
 L["label_ttt2_maid_throw_knife_speed"] = "How fast can the knives be thrown (knives per second)"
+L["label_ttt2_maid_throw_angle_velocity"] = "Angle Velocity of one knife (x100)"
+L["label_ttt2_maid_throw_velocity"] = "Velocity of one thrown knife (x100)"

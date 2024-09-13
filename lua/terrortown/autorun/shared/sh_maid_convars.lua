@@ -12,6 +12,8 @@ MAID_CVARS = {
 	["ttt2_maid_is_public_role"] = {0, true, 1},
 	["ttt2_maid_throw_knife_damage"] = {1,3,100},
 	["ttt2_maid_throw_knife_speed"] = {1,4,10},
+	["ttt2_maid_throw_angle_velocity"] = {1, 30, 100},
+	["ttt2_maid_throw_velocity"] = {1, 30, 100},
 }
 
 local function str(val)
