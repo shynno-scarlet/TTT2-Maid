@@ -133,7 +133,7 @@ function SWEP:ThrowKnife()
 	local view = owner:GetAimVector()
 	local cross = view:Cross(vector_up)
 	cross:Normalize()
-	cross:Mul(self.AngleVelocity:GetInt())
+	cross:Mul(self.AngleVelocity:GetInt() * 100)
 	local pos = view * 16
 	pos:Add(owner:EyePos())
 
@@ -149,7 +149,7 @@ function SWEP:ThrowKnife()
 
 	-- launch ent
 	local phys = ent:GetPhysicsObject()
-	view:Mul(self.ThrowVelocity:GetInt())
+	view:Mul(self.ThrowVelocity:GetInt() * 100)
 	view:Add(VectorRand(-10, 10))
 	phys:ApplyForceCenter(view)
 	phys:AddGameFlag(64)
@@ -163,9 +163,10 @@ function SWEP:ThrowKnife()
 	-- ply dmg
 	ent:AddCallback("PhysicsCollide", function(collider, data)
 		local hit_ent = data.HitEntity
-		if hit_ent and hit_ent:IsValid() and hit_ent:IsPlayer() and (not ent:OnGround()) then
-			hit_ent:TakeDamage(self.ThrowingDmg:GetInt(), owner, self)
-			if ent:Isvalid() then
+		if hit_ent then
+			if hit_ent:IsValid() and hit_ent:IsPlayer() and (not ent:OnGround()) then
+				hit_ent:TakeDamage(self.ThrowingDmg:GetInt(), owner, self)
+			elseif hit_ent:IsWorld() and ent:IsValid() then
 				ent:Remove()
 			end
 		end
