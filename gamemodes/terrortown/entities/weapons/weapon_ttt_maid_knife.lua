@@ -139,8 +139,8 @@ function SWEP:ThrowKnife()
 	ent:SetPos(pos)
 	ent:SetAngles(owner:EyeAngles())
 	ent:Spawn()
-	local cb = ent:AddCallback("PhysicsCollide", function(collider)
-		local hit_ent = collider:GetEntity()
+	local cb = ent:AddCallback("PhysicsCollide", function(collider, data)
+		local hit_ent = data.HitEntity
 		if hit_ent and hit_ent:IsValid() and hit_ent:IsPlayer() then
 			hit_ent:TakeDamage(self.ThrowingDmg, owner, self)
 		end
