@@ -121,18 +121,18 @@ end
 
 function SWEP:ThrowKnife()
 	local mdl = "models/weapons/cstrike/c_knife_t.mdl"
-	local owner = self.GetOwner()
+	local owner = self:GetOwner()
 
 	local view = owner:GetAimVector()
 	local pos = view * 16
-	pos:Add(owner.EyePos())
+	pos:Add(owner:EyePos())
 
 	-- create knife bullet entity
 	local ent = ents.Create("prop_physics")
 	ent.maid_throwing_knife = true
 	ent:SetModel(mdl)
 	ent:SetPos(pos)
-	ent:SetAngles(owner.EyeAngles())
+	ent:SetAngles(owner:EyeAngles())
 	ent:Spawn()
 	local cb = ent:AddCallback("PhysicsCollide", function(collider)
 		local hit_ent = collider:GetEntity()
@@ -146,7 +146,7 @@ function SWEP:ThrowKnife()
 	local phys = ent:GetPhysicsObject()
 	view:Mul(1000)
 	view:Add(VectorRand(-100, 100))
-	phys.ApplyForceCenter(view)
+	phys:ApplyForceCenter(view)
 	self:EmitSound(self.ShootSound, 75, 150)
 
 	-- despawn after 20 sec
