@@ -33,7 +33,7 @@ SWEP.Primary.Damage = 0
 SWEP.Primary.ClipSize = -1
 SWEP.Primary.DefaultClip = -1
 SWEP.Primary.Automatic = false
-SWEP.Primary.Delay = 1 / GetConVar("ttt2_maid_throw_knife_speed"):GetInt()
+SWEP.Primary.Delay = 1 / GetConVar("ttt2_maid_throw_knife_speed"):GetFloat()
 SWEP.Primary.Ammo = "none"
 
 SWEP.Secondary.ClipSize = -1
@@ -163,6 +163,14 @@ function SWEP:PrimaryAttack()
 	end
 	self:ThrowKnife()
 	self:SetNextPrimaryFire(CurTime() + self.Primary.Delay)
+end
+
+function SWEP:CanPrimaryAttack()
+	return CurTime() > self:GetNextPrimaryFire()
+end
+
+function SWEP:CanSecondaryAttack()
+	return CurTime() > self:GetNextSecondaryFire()
 end
 
 function SWEP:Reload()
