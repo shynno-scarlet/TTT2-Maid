@@ -13,8 +13,12 @@ In the the detective team she can cook meals for people and heal them.
 If she works for a defective she can cook poisoned meals that will heal players, but kill them after a while.]]
 
 L["maid_paid_by"] = "You got paid by {name}."
-L["maid_work_1"] = "You work for them now."
-L["maid_work_2"] = "You still work for your employer."
+L["maid_work_1"] = "They're your master now."
+L["maid_work_2"] = "You still work for your master."
+L["maid_refund"] = "The maid already has a master. Your credits were refunded."
+L["maid_dead"] = "The maid is already dead. Your credits were refunded."
+L["maid_not_enough_credits"] = "You need to pay at least {num} credits."
+L["maid_blocked"] = "A maid can't transfer credits to somebody else."
 
 L["maid_healed_you"] = "The maid cooked a healthy meal for you."
 L["maid_heal"] = "You healed {ply}"

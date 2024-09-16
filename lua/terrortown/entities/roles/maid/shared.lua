@@ -66,42 +66,50 @@ function ROLE:AddToSettingsMenu(parent)
 end
 
 if SERVER then
-	hook.Add("TTT2CanTransferCredits", "Allow_Maid_Salary", function(send, rec, creds)
-		if rec:GetSubRole() == ROLE_MAID then
-			printg("Allowing Transfer Credits (X -> Maid)")
-			return true
+	hook.Add("TTT2CanTransferCredits", "Maid_Salary", function(send, rec, creds)
+		-- block all transfers from the maid
+		if send:GetSubRole() == ROLE_MAID then
+			LANG.Msg(send, "maid_blocked", {}, MSG_CHAT_ROLE)
+			return false, LANG.GetTranslation("maid_blocked")
 		end
-	end)
 
-	hook.Add("TTT2TransferCredits", "Maid_Salary", function(send, rec, creds, is_dead)
-		printg("On Transfer Credits called")
-		printg(send)
-		printg(send:GetSubRole())
-		printg(rec)
-		printg(rec:GetSubRole())
-		printg(creds)
-		printg(is_dead)
-		if rec:GetSubRole() != ROLE_MAID then
+		-- check role
+		if rec:GetSubRole() ~= ROLE_MAID then
 			return
 		end
-		if (not is_dead) and (creds >= GetConVar("ttt2_maid_salary"):GetInt()) then
-			LANG.Msg(rec, "maid_got_paid", { name = send:Nick() }, MSG_CHAT_ROLE)
-			if not rec.maid_paid then
-				rec.maid_paid = true
-				rec.maid_owner = send
-				rec.GetSubRoleData().unknownTeam = false
-				rec:UpdateTeam(send:GetTeam())
-				rec:SetBaseRole(send:GetBaseRole())
-				LANG.Msg(rec, "maid_work_1", {}, MSG_CHAT_ROLE)
-			else
-				LANG.Msg(rec, "maid_work_2", {}, MSG_CHAT_ROLE)
-			end
-		elseif (GetConVar("ttt2_maid_refund_credits"):GetBool()) then
-			-- revert transaction
-			send:SetCredits(send:GetCedits() + creds)
-			rec:SetCredits(rec:GetCredits() - creds)
+
+		-- check credit amount
+		local salary = GetConVar("ttt2_maid_salary"):GetInt()
+		if (creds < salary) then
+			LANG.Msg(send, "maid_not_enough_credits", { num = salary }, MSG_CHAT_ROLE)
+			return false, LANG.GetTranslation("maid_not_enough_credits")
 		end
+
+		-- check alive
+		if not (rec:IsValid() and rec:Alive()) then
+			LANG.Msg(send, "maid_dead", {}, MSG_CHAT_ROLE)
+			return false, LANG.GetTranslation("maid_dead")
+		end
+
+		-- process payment
+		LANG.Msg(rec, "maid_got_paid", { name = send:Nick() }, MSG_CHAT_ROLE)
+		if not rec.maid_paid then
+			rec.maid_paid = true
+			rec.maid_owner = send
+			rec:UpdateTeam(send:GetRealTeam(), false, false)
+			LANG.Msg(rec, "maid_work_1", {}, MSG_CHAT_ROLE)
+			printg("maid got paid")
+		else
+			LANG.Msg(rec, "maid_work_2", {}, MSG_CHAT_ROLE)
+			if (GetConVar("ttt2_maid_refund_credits"):GetBool()) then
+				LANG.Msg(send, "maid_refund", {}, MSG_CHAT_ROLE)
+				printg("maid was already paid")
+				return false, LANG.GetTranslation("maid_refund")
+			end
+		end
+
+		printg("processed payment")
 	end)
 
-	printg("Version 7 Loaded")
+	printg("Version 12 Loaded")
 end
