@@ -1,39 +1,39 @@
-L = LANG.GetLanguageTableReference("en")
+L = LANG.GetLanguageTableReference("de")
 
 L[MAID.name] = "Maid"
 L["maids"] = "Maids"
-L["info_popup_" .. MAID.abbr] = "You are a Maid!"
-L["body_found_" .. MAID.abbr] = "They were a Maid!"
-L["search_role_" .. MAID.abbr] = "This person was a Maid!"
+L["info_popup_" .. MAID.abbr] = "Du bist eine Maid!"
+L["body_found_" .. MAID.abbr] = "Sie war eine Maid!"
+L["search_role_" .. MAID.abbr] = "Diese Person war eine Maid!"
 L["target_" .. MAID.abbr] = "Maid"
-L["ttt2_desc_" .. MAID.abbr] = [[ A Maid is a neutral role until she gets paid by a detective or traitor.
-The maid has a special knfie that can perform one of the following actions:
-In the traitor team she can clean up bodies.
-In the the detective team she can cook meals for people and heal them.
-If she works for a defective she can cook poisoned meals that will heal players, but kill them after a while.]]
+L["ttt2_desc_" .. MAID.abbr] = [[Eine Maid ist eine neutrale Rolle bis sie von einem Traitor oder Detektiv angeheuert wird.
+Die Maid hat ein spezielles Messer, welches eine der folgenden Aktionen ausführen kann:
+Im Traitor-Team kann sie Leichen entsorgen.
+Im Detektiv-Team kann sie für andere Spieler ein gesundes Essen kochen.
+Im Defektiv-Team kann sie vergiftetes Essen kochen, welches Spieler erst heilt und später tötet.]]
 
-L["maid_paid_by"] = "You got paid by {name}."
-L["maid_work_1"] = "They're your master now."
-L["maid_work_2"] = "You still work for your master."
-L["maid_refund"] = "The maid already has a master. Your credits were refunded."
-L["maid_dead"] = "The maid is already dead. Your credits were refunded."
-L["maid_not_enough_credits"] = "You need to pay at least {num} credits."
-L["maid_blocked"] = "A maid can't transfer credits to somebody else."
+L["maid_paid_by"] = "Du wurdest von {name} bezahlt."
+L["maid_work_1"] = "Er/Sie ist nun dein neuer Meister."
+L["maid_work_2"] = "Du arbeitest weiterhin für deinen alten Meister."
+L["maid_refund"] = "Diese Maid hat bereits einen Meister. Deine Credits wurden zurückerstattet."
+L["maid_dead"] = "Diese Maid ist bereits tot. Deine Credits wurden zurückerstattet."
+L["maid_not_enough_credits"] = "Du musst mindestens {num} Credits bezahlen."
+L["maid_blocked"] = "Eine Maid kann niemandem Credits überweisen."
 
-L["maid_healed_you"] = "The maid cooked a healthy meal for you."
-L["maid_heal"] = "You healed {ply}"
-L["maid_poison"] = "You poisoned {ply}"
-L["maid_corpse_removed"] = "You removed the corpse of {ply}"
-L["maid_kill"] = "You killed {ply} with poison"
+L["maid_healed_you"] = "Eine Maid hat dir ein gesundes Essen zubereitet."
+L["maid_heal"] = "Du hast {ply} geheilt."
+L["maid_poison"] = "Du hast {ply} vergiftet."
+L["maid_corpse_removed"] = "Du hast die Leiche von {ply} entsorgt."
+L["maid_kill"] = "Du hast {ply} mit deinem Gift getötet."
 
-L["label_ttt2_maid_salary"] = "The salary for the maid"
-L["label_ttt2_maid_poison_time_min"] = "Minimum time to poison kill (Defective Maid)"
-L["label_ttt2_maid_poison_time_max"] = "Maximum time to poison kill (Defective Maid)"
-L["label_ttt2_maid_heal_amount"] = "The amount one meal can heal"
-L["label_ttt2_maid_ability_cooldown"] = "The cooldown of the maids abilities"
-L["label_ttt2_maid_refund_credits"] = "Refund credits if the maid was already hired"
-L["label_ttt2_maid_is_public_role"] = "Is the role shown to everyone?"
-L["label_ttt2_maid_throw_knife_damage"] = "Damage dealt when a throwing knife hits"
-L["label_ttt2_maid_throw_knife_speed"] = "How fast can the knives be thrown (knives per second)"
-L["label_ttt2_maid_throw_angle_velocity"] = "Angle Velocity of one knife (x100)"
-L["label_ttt2_maid_throw_velocity"] = "Velocity of one thrown knife (x100)"
+L["label_ttt2_maid_salary"] = "Die Bezahlung für die Maid"
+L["label_ttt2_maid_poison_time_min"] = "Minimale Zeit bis zum Gift-Tod (Defektiv Maid)"
+L["label_ttt2_maid_poison_time_max"] = "Maximale Zeit bis zum Gift-Tod (Defektiv Maid)"
+L["label_ttt2_maid_heal_amount"] = "Wie viele HP heilt ein Essen?"
+L["label_ttt2_maid_ability_cooldown"] = "Cooldown der Spezial-Fähigkeiten der Maid"
+L["label_ttt2_maid_refund_credits"] = "Credits zurückerstatten, wenn die Maid bereits einen Meister hat"
+L["label_ttt2_maid_is_public_role"] = "Soll die Maid allen Spielern angezeigt werden?"
+L["label_ttt2_maid_throw_knife_damage"] = "Schaden der von einem Wurfmesser verursacht wird"
+L["label_ttt2_maid_throw_knife_speed"] = "Wie schnell können Messer geworfen werden (Messer pro Sekunde)"
+L["label_ttt2_maid_throw_angle_velocity"] = "Winkelgeschwindigkeit der Wurfmesser (x100)"
+L["label_ttt2_maid_throw_velocity"] = "Geschwindigkeit der Wurfmesser (x100)"
