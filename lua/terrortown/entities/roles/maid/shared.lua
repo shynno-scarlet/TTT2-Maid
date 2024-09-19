@@ -41,10 +41,6 @@ if SERVER then
 	end
 end
 
-function ROLE:IsShoppingRole()
-	return true
-end
-
 function ROLE:AddToSettingsMenu(parent)
 	local form = vgui.CreateTTT2Form(parent, "header_roles_additional")
 	for var, val in pairs(MAID_CVARS) do
@@ -101,6 +97,7 @@ if SERVER then
 			printg("maid got paid")
 		else
 			LANG.Msg(rec, "maid_work_2", {}, MSG_CHAT_ROLE)
+			printg("maid was already paid")
 			if (GetConVar("ttt2_maid_refund_credits"):GetBool()) then
 				LANG.Msg(send, "maid_refund", {}, MSG_CHAT_ROLE)
 				printg("maid was already paid")
@@ -111,5 +108,12 @@ if SERVER then
 		printg("processed payment")
 	end)
 
-	printg("Version 12 Loaded")
+	hook.Add("TTTBeginRound", "Maid_Cleanup", function (arguments)
+		for i,ply in ipairs(player.GetAll()) do
+			ply.maid_paid = false
+			rec.maid_owner = nil
+		end
+	end)
+
+	printg("Version 13 Loaded")
 end
