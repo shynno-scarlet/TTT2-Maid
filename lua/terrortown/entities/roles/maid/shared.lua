@@ -66,7 +66,7 @@ if SERVER then
 		-- block all transfers from the maid
 		if send:GetSubRole() == ROLE_MAID then
 			LANG.Msg(send, "maid_blocked", {}, MSG_CHAT_ROLE)
-			return false, LANG.GetTranslation("maid_blocked")
+			return false
 		end
 
 		-- check role
@@ -78,18 +78,22 @@ if SERVER then
 		local salary = GetConVar("ttt2_maid_salary"):GetInt()
 		if (creds < salary) then
 			LANG.Msg(send, "maid_not_enough_credits", { num = salary }, MSG_CHAT_ROLE)
-			return false, LANG.GetTranslation("maid_not_enough_credits")
+			return false
 		end
 
 		-- check alive
 		if not (rec:IsValid() and rec:Alive()) then
 			LANG.Msg(send, "maid_dead", {}, MSG_CHAT_ROLE)
-			return false, LANG.GetTranslation("maid_dead")
+			return false
 		end
 	end)
 
 	hook.Add("TTT2OnTransferCredits", "Maid_Payment", function (send, rec, creds, isDead)
 		printg("on transfer credits")
+		-- check role
+		if rec:GetSubRole() ~= ROLE_MAID then
+			return
+		end
 
 		-- process payment
 		LANG.Msg(rec, "maid_got_paid", { name = send:Nick() }, MSG_CHAT_ROLE)
@@ -104,8 +108,6 @@ if SERVER then
 			printg("maid was already paid")
 			if (GetConVar("ttt2_maid_refund_credits"):GetBool()) then
 				LANG.Msg(send, "maid_refund", {}, MSG_CHAT_ROLE)
-				printg("maid was already paid")
-				return false, LANG.GetTranslation("maid_refund")
 			end
 		end
 
@@ -115,7 +117,7 @@ if SERVER then
 	hook.Add("TTTBeginRound", "Maid_Cleanup", function (arguments)
 		for i,ply in ipairs(player.GetAll()) do
 			ply.maid_paid = false
-			rec.maid_owner = nil
+			ply.maid_owner = nil
 		end
 	end)
 
