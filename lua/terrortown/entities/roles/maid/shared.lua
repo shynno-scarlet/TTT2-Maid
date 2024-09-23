@@ -62,7 +62,7 @@ function ROLE:AddToSettingsMenu(parent)
 end
 
 if SERVER then
-	hook.Add("TTT2CanTransferCredits", "Maid_Salary", function(send, rec, creds)
+	hook.Add("TTT2CanTransferCredits", "Maid_Payment_Check", function(send, rec, creds)
 		-- block all transfers from the maid
 		if send:GetSubRole() == ROLE_MAID then
 			LANG.Msg(send, "maid_blocked", {}, MSG_CHAT_ROLE)
@@ -86,6 +86,10 @@ if SERVER then
 			LANG.Msg(send, "maid_dead", {}, MSG_CHAT_ROLE)
 			return false, LANG.GetTranslation("maid_dead")
 		end
+	end)
+
+	hook.Add("TTT2OnTransferCredits", "Maid_Payment", function (send, rec, creds, isDead)
+		printg("on transfer credits")
 
 		-- process payment
 		LANG.Msg(rec, "maid_got_paid", { name = send:Nick() }, MSG_CHAT_ROLE)
@@ -115,5 +119,5 @@ if SERVER then
 		end
 	end)
 
-	printg("Version 13 Loaded")
+	printg("Version 14 Loaded")
 end
