@@ -2,6 +2,14 @@ if SERVER then
 	AddCSLuaFile()
 end
 
+local function printg(msg)
+	msg = "[maid role] " .. tostring(msg)
+	print(msg)
+	for i,ply in ipairs(player.GetAll()) do
+		ply:PrintMessage(2, msg)
+	end
+end
+
 SWEP.PrintName = "Maid Knife"
 SWEP.Author = "shynno_scarlet"
 SWEP.Instructions = "Primary: Throw a knife; Secondary: Use special ability"
@@ -64,42 +72,39 @@ function SWEP:IsDeadPlayer(ent)
 	return ent:IsValid() and ent:IsRagdoll() and ent.player_ragdoll
 end
 
-function SWEP:PoisonedMeal(owner)
-	local ent = Player:GetEyeTrace().Entity
+function SWEP:PoisonedMeal(owner, ent)
 	if self:IsAlivePlayer(ent) then
-		self:HealingMeal(owner)
+		self:HealingMeal(owner, ent)
 		local min = GetConVar("ttt2_maid_poison_time_min"):GetInt()
 		local max = GetConVar("ttt2_maid_poison_time_max"):GetInt()
 		local delay = math.random(min, max)
 		timer.Simple(delay, function()
 			if self:IsAlivePlayer(ent) then
 				ent:KillSilent()
-				LANG.Msg(owner, "maid_kill", { ply = ent:Nick() }, MSG_CHAT_ROLE)
+				LANG.Msg(owner, "maid_kill", { ply = ent:Nick() }, MSG_MSTACK_ROLE)
 			end
 		end)
-		LANG.Msg(owner, "maid_poison", { ply = ent:Nick() }, MSG_CHAT_ROLE)
+		LANG.Msg(owner, "maid_poison", { ply = ent:Nick() }, MSG_MSTACK_ROLE)
 	else
 		self:SetNextSecondaryFire(0)
 	end
 end
 
-function SWEP:RemoveBody(owner)
-	local ent = Player:GetEyeTrace().Entity
+function SWEP:RemoveBody(owner, ent)
 	if self:IsDeadPlayer(ent) then
 		ent:Remove()
-		LANG.Msg(owner, "maid_corpse_removed", { ply = ent:GetName() }, MSG_CHAT_ROLE)
+		LANG.Msg(owner, "maid_corpse_removed", { ply = ent:GetName() }, MSG_MSTACK_ROLE)
 	else
 		self:SetNextSecondaryFire(0)
 	end
 end
 
-function SWEP:HealingMeal(owner)
-	local ent = Player:GetEyeTrace().Entity
+function SWEP:HealingMeal(owner, ent)
 	if self:IsAlivePlayer(ent) then
 		local heal = GetConVar("ttt2_maid_heal_amount"):GetInt()
-		LANG.Msg(ent, "maid_healed_you", {}, MSG_CHAT_ROLE)
+		LANG.Msg(ent, "maid_healed_you", {}, MSG_MSTACK_ROLE)
 		ent:SetHealth(heal + ent:GetHealth())
-		LANG.Msg(owner, "maid_heal", { ply = ent:Nick() }, MSG_CHAT_ROLE)
+		LANG.Msg(owner, "maid_heal", { ply = ent:Nick() }, MSG_MSTACK_ROLE)
 	else
 		self:SetNextSecondaryFire(0)
 	end
@@ -107,16 +112,21 @@ end
 
 function SWEP:SecondaryAttack()
 	if not self:CanSecondaryAttack() then
+		printg("Can't secondary attack")
 		return
 	end
 	local owner = self:GetOwner()
 	if owner.maid_owner then
+		local ent = owner:GetEyeTrace().Entity
+		-- defective
 		if owner.maid_owner:GetSubRole() == ROLE_DEFECTIVE then
-			self:PoisonedMeal(owner)
+			self:PoisonedMeal(owner, ent)
+		-- traitor team
 		elseif owner.maid_owner:HasEvilTeam() then
-			self:RemoveBody(owner)
-		elseif owner:GetTeam() != TEAM_NONE then
-			self:HealingMeal(owner)
+			self:RemoveBody(owner, ent)
+		-- any other team
+		elseif owner:GetTeam() ~= TEAM_NONE then
+			self:HealingMeal(owner, ent)
 		end
 	end
 end

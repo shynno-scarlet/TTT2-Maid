@@ -26,6 +26,10 @@ L["maid_poison"] = "Du hast {ply} vergiftet."
 L["maid_corpse_removed"] = "Du hast die Leiche von {ply} entsorgt."
 L["maid_kill"] = "Du hast {ply} mit deinem Gift getötet."
 
+L["maid_secondary_def"] = "DEFEKTIV MAID: Du kannst für andere Spieler vergiftetes Essen kochen."
+L["maid_secondary_traitor"] = "TRAITOR MAID: Du kannst Leichen entfernen."
+L["maid_secondary_inno"] = "INNOCENT MAID: Du kannst für andere Spieler gesundes Essen kochen."
+
 L["label_ttt2_maid_salary"] = "Die Bezahlung für die Maid"
 L["label_ttt2_maid_poison_time_min"] = "Minimale Zeit bis zum Gift-Tod (Defektiv Maid)"
 L["label_ttt2_maid_poison_time_max"] = "Maximale Zeit bis zum Gift-Tod (Defektiv Maid)"

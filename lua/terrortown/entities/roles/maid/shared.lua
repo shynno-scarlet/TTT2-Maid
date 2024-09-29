@@ -3,14 +3,6 @@ if SERVER then
 	resource.AddFile("materials/vgui/ttt/dynamic/roles/icon_maid.vmt")
 end
 
-local function printg(msg)
-	msg = "[maid role] " .. tostring(msg)
-	print(msg)
-	for i,ply in ipairs(player.GetAll()) do
-		ply:PrintMessage(2, msg)
-	end
-end
-
 function ROLE:PreInitialize()
 	self.Base = "ttt_role_base"
 	self.index = ROLE_MAID
@@ -61,65 +53,74 @@ function ROLE:AddToSettingsMenu(parent)
 	end
 end
 
+local function CreditsHelper(bool, msg, msg_args, send)
+	if CLIENT then
+		return bool, LANG.GetParamTranslation(msg, msg_args)
+	end
+
+	if SERVER then
+		LANG.Msg(send, msg, msg_args, MSG_MSTACK_ROLE)
+		return bool
+	end
+end
+
+hook.Add("TTT2CanTransferCredits", "Maid_Payment_Check", function(send, rec, creds)
+	-- block all transfers from the maid
+	if send:GetSubRole() == ROLE_MAID then
+		return CreditsHelper(false, "maid_blocked", {}, send)
+	end
+
+	-- check role
+	if rec:GetSubRole() ~= ROLE_MAID then
+		return
+	end
+
+	-- check credit amount
+	local salary = GetConVar("ttt2_maid_salary"):GetInt()
+	if (creds < salary) then
+		return CreditsHelper(false, "maid_not_enough_credits", { num = salary }, send)
+	end
+
+	-- check alive
+	if not (rec:IsValid() and rec:Alive()) then
+		return CreditsHelper(false, "maid_dead", {}, send)
+	end
+end)
+
 if SERVER then
-	hook.Add("TTT2CanTransferCredits", "Maid_Payment_Check", function(send, rec, creds)
-		-- block all transfers from the maid
-		if send:GetSubRole() == ROLE_MAID then
-			LANG.Msg(send, "maid_blocked", {}, MSG_CHAT_ROLE)
-			return false
-		end
-
-		-- check role
-		if rec:GetSubRole() ~= ROLE_MAID then
-			return
-		end
-
-		-- check credit amount
-		local salary = GetConVar("ttt2_maid_salary"):GetInt()
-		if (creds < salary) then
-			LANG.Msg(send, "maid_not_enough_credits", { num = salary }, MSG_CHAT_ROLE)
-			return false
-		end
-
-		-- check alive
-		if not (rec:IsValid() and rec:Alive()) then
-			LANG.Msg(send, "maid_dead", {}, MSG_CHAT_ROLE)
-			return false
-		end
-	end)
-
 	hook.Add("TTT2OnTransferCredits", "Maid_Payment", function (send, rec, creds, isDead)
-		printg("on transfer credits")
 		-- check role
 		if rec:GetSubRole() ~= ROLE_MAID then
 			return
 		end
 
 		-- process payment
-		LANG.Msg(rec, "maid_got_paid", { name = send:Nick() }, MSG_CHAT_ROLE)
-		if not rec.maid_paid then
-			rec.maid_paid = true
+		LANG.Msg(rec, "maid_paid_by", { name = send:Nick() }, MSG_MSTACK_ROLE)
+		if rec.maid_owner == nil then
 			rec.maid_owner = send
 			rec:UpdateTeam(send:GetRealTeam(), false, false)
-			LANG.Msg(rec, "maid_work_1", {}, MSG_CHAT_ROLE)
-			printg("maid got paid")
+			LANG.Msg(rec, "maid_work_1", {}, MSG_MSTACK_ROLE)
+			-- defective
+			if owner.maid_owner:GetSubRole() == ROLE_DEFECTIVE then
+				LANG.Msg(rec, "maid_secondary_def", {}, MSG_MSTACK_ROLE)
+			-- traitor team
+			elseif owner.maid_owner:HasEvilTeam() then
+				LANG.Msg(rec, "maid_secondary_traitor", {}, MSG_MSTACK_ROLE)
+			-- any other team
+			elseif owner:GetTeam() ~= TEAM_NONE then
+				LANG.Msg(rec, "maid_secondary_inno", {}, MSG_MSTACK_ROLE)
+			end
 		else
-			LANG.Msg(rec, "maid_work_2", {}, MSG_CHAT_ROLE)
-			printg("maid was already paid")
+			LANG.Msg(rec, "maid_work_2", {}, MSG_MSTACK_ROLE)
 			if (GetConVar("ttt2_maid_refund_credits"):GetBool()) then
-				LANG.Msg(send, "maid_refund", {}, MSG_CHAT_ROLE)
+				LANG.Msg(send, "maid_refund", {}, MSG_MSTACK_PLAIN)
 			end
 		end
-
-		printg("processed payment")
 	end)
 
-	hook.Add("TTTBeginRound", "Maid_Cleanup", function (arguments)
+	hook.Add("TTTBeginRound", "Maid_Cleanup", function ()
 		for i,ply in ipairs(player.GetAll()) do
-			ply.maid_paid = false
 			ply.maid_owner = nil
 		end
 	end)
-
-	printg("Version 14 Loaded")
 end
