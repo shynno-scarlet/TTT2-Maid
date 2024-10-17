@@ -32,7 +32,7 @@ local function desc(var, def)
 end
 
 for var, val in pairs(MAID_CVARS) do
-	CreateConVar(var, str(val[2]), {FCVAR_NOTIFY, FCVAR_ARCHIVE}, desc(var, val[2]), val[1], val[3])
+	CreateConVar(var, str(val[2]), {FCVAR_NOTIFY, FCVAR_ARCHIVE, FCVAR_REPLICATED}, desc(var, val[2]), val[1], val[3])
 end
 
 hook.Add("TTTUlxDynamicRCVars", "ttt2_ulx_maid_cvars", function(tbl)
