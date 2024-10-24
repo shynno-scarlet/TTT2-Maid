@@ -1,6 +1,7 @@
 if SERVER then
 	AddCSLuaFile()
 	resource.AddFile("materials/vgui/ttt/dynamic/roles/icon_maid.vmt")
+	util.AddNetworkString("ttt2_maid_thermalvis")
 end
 
 function ROLE:PreInitialize()
@@ -111,6 +112,9 @@ if SERVER then
 				LANG.Msg(rec, "maid_secondary_inno", {}, MSG_MSTACK_ROLE)
 			end
 			SendFullStateUpdate()
+			net.Start("ttt2_maid_thermalvis")
+			net.WritePlayer(send)
+			net.Send()
 		else
 			LANG.Msg(rec, "maid_work_2", {}, MSG_MSTACK_ROLE)
 			if (GetConVar("ttt2_maid_refund_credits"):GetBool()) then
@@ -142,5 +146,20 @@ if SERVER then
 
 	hook.Add("TTTEndRound", "EndRound_SetState", function ()
 		round_running = false
+	end)
+end
+
+if CLIENT then
+	net.Receive("ttt2_maid_thermalvis", function ()
+		local master = net.ReadPlayer()
+		LocalPlayer().thermalvis = master
+		thermalvision.Add({master}, THERMALVISION_MODE_BOTH)
+	end)
+
+	hook.Add("TTTEndRound", "EndRound_ClearThermalVis",  function()
+		if LocalPlayer().thermalvis ~= nil then
+			thermalvision.Remove({LocalPlayer().thermalvis})
+		end
+		thermalvision.Clear()
 	end)
 end
