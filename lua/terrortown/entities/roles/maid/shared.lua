@@ -110,6 +110,7 @@ if SERVER then
 			elseif owner:GetTeam() ~= TEAM_NONE then
 				LANG.Msg(rec, "maid_secondary_inno", {}, MSG_MSTACK_ROLE)
 			end
+			SendFullStateUpdate()
 		else
 			LANG.Msg(rec, "maid_work_2", {}, MSG_MSTACK_ROLE)
 			if (GetConVar("ttt2_maid_refund_credits"):GetBool()) then
