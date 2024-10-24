@@ -118,9 +118,28 @@ if SERVER then
 		end
 	end)
 
+	local round_running = false;
+
 	hook.Add("TTTBeginRound", "Maid_Cleanup", function ()
 		for i,ply in ipairs(player.GetAll()) do
 			ply.maid_owner = nil
 		end
+		round_running = true;
+		timer.Create("notify_maids", 5, -1, function ()
+			if round_running then
+				for _,ply in ipairs(player.GetAll()) do
+					if ply.maid_owner ~= nil then
+						local dat = {name = ply.maid_owner:Nick(), role = ply.maid_owner:GetRoleString()}
+						LANG.Msg(ply, "maid_announce_master", dat, MSG_MSTACK_ROLE)
+					end
+				end
+			else
+				timer.Remove("notify_maids")
+			end
+		end)
+	end)
+
+	hook.Add("TTTEndRound", "EndRound_SetState", function ()
+		round_running = false
 	end)
 end

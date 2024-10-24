@@ -30,6 +30,8 @@ L["maid_secondary_def"] = "DEFECTIVE MAID: You can poison other players with you
 L["maid_secondary_traitor"] = "TRAITOR MAID: You can remove bodies."
 L["maid_secondary_inno"] = "INNOCENT MAID: You can heal other players with your meals."
 
+L["maid_announce_master"] = "Your master is {name} ({role})"
+
 L["label_ttt2_maid_salary"] = "The salary for the maid"
 L["label_ttt2_maid_poison_time_min"] = "Minimum time to poison kill (Defective Maid)"
 L["label_ttt2_maid_poison_time_max"] = "Maximum time to poison kill (Defective Maid)"
