@@ -2,14 +2,6 @@ if SERVER then
 	AddCSLuaFile()
 end
 
-local function printg(msg)
-	msg = "[maid role] " .. tostring(msg)
-	print(msg)
-	for i,ply in ipairs(player.GetAll()) do
-		ply:PrintMessage(2, msg)
-	end
-end
-
 SWEP.PrintName = "Maid Knife"
 SWEP.Author = "shynno_scarlet"
 SWEP.Instructions = "Primary: Throw a knife; Secondary: Use special ability"
@@ -112,7 +104,6 @@ end
 
 function SWEP:SecondaryAttack()
 	if not self:CanSecondaryAttack() then
-		printg("Can't secondary attack")
 		return
 	end
 	local owner = self:GetOwner()
