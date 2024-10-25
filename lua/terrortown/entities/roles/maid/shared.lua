@@ -111,7 +111,6 @@ if SERVER then
 			elseif owner:GetTeam() ~= TEAM_NONE then
 				LANG.Msg(rec, "maid_secondary_inno", {}, MSG_MSTACK_ROLE)
 			end
-			ttt2net.SendFullStateUpdate()
 			net.Start("ttt2_maid_thermalvis")
 			net.WritePlayer(send)
 			net.Send()
