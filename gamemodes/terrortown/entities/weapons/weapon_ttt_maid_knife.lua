@@ -9,6 +9,7 @@ SWEP.Spawnable = false
 SWEP.ViewModelFlip = false
 SWEP.ViewModelFOV = 54
 SWEP.DrawCrosshair = true
+SWEP.CanBuy = {}
 
 SWEP.EquipMenuData = {
 	type = "item_weapon",
@@ -71,14 +72,14 @@ function SWEP:PoisonedMeal(owner, ent)
 		local max = GetConVar("ttt2_maid_poison_time_max"):GetInt()
 		local delay = math.random(min, max)
 		timer.Simple(delay, function()
+			if not IsValid(self) then return end
 			if self:IsAlivePlayer(ent) then
-				ent:KillSilent()
+				ent:Kill()
 				LANG.Msg(owner, "maid_kill", { ply = ent:Nick() }, MSG_MSTACK_ROLE)
 			end
 		end)
 		LANG.Msg(owner, "maid_poison", { ply = ent:Nick() }, MSG_MSTACK_ROLE)
-	else
-		self:SetNextSecondaryFire(0)
+		return true
 	end
 end
 
@@ -86,8 +87,7 @@ function SWEP:RemoveBody(owner, ent)
 	if self:IsDeadPlayer(ent) then
 		ent:Remove()
 		LANG.Msg(owner, "maid_corpse_removed", { ply = ent:GetName() }, MSG_MSTACK_ROLE)
-	else
-		self:SetNextSecondaryFire(0)
+		return true
 	end
 end
 
@@ -95,10 +95,9 @@ function SWEP:HealingMeal(owner, ent)
 	if self:IsAlivePlayer(ent) then
 		local heal = GetConVar("ttt2_maid_heal_amount"):GetInt()
 		LANG.Msg(ent, "maid_healed_you", {}, MSG_MSTACK_ROLE)
-		ent:SetHealth(heal + ent:GetHealth())
+		ent:SetHealth(heal + ent:Health())
 		LANG.Msg(owner, "maid_heal", { ply = ent:Nick() }, MSG_MSTACK_ROLE)
-	else
-		self:SetNextSecondaryFire(0)
+		return true
 	end
 end
 
@@ -106,18 +105,26 @@ function SWEP:SecondaryAttack()
 	if not self:CanSecondaryAttack() then
 		return
 	end
+
 	local owner = self:GetOwner()
 	if owner.maid_owner then
 		local ent = owner:GetEyeTrace().Entity
+		local succ = false
 		-- defective
 		if owner.maid_owner:GetSubRole() == ROLE_DEFECTIVE then
-			self:PoisonedMeal(owner, ent)
+			succ = self:PoisonedMeal(owner, ent)
 		-- traitor team
 		elseif owner.maid_owner:HasEvilTeam() then
-			self:RemoveBody(owner, ent)
+			succ = self:RemoveBody(owner, ent)
 		-- any other team
 		elseif owner:GetTeam() ~= TEAM_NONE then
-			self:HealingMeal(owner, ent)
+			succ = self:HealingMeal(owner, ent)
+		end
+
+		if succ then
+			self:SetNextSecondaryFire(CurTime() + self.Secondary.Delay)
+		else
+			self:SetNextPrimaryFire(CurTime())
 		end
 	end
 end

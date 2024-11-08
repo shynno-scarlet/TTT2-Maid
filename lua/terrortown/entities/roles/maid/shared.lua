@@ -1,14 +1,16 @@
 if SERVER then
 	AddCSLuaFile()
 	resource.AddFile("materials/vgui/ttt/dynamic/roles/icon_maid.vmt")
-	util.AddNetworkString("ttt2_maid_thermalvis")
+	util.AddNetworkString("ttt2_maid_update")
 end
+
+local color = Color(101, 82, 180, 255)
 
 function ROLE:PreInitialize()
 	self.Base = "ttt_role_base"
 	self.index = ROLE_MAID
 	self.name = "maid"
-	self.color = Color(101, 82, 180, 255)
+	self.color = color
 	self.abbr = "maid"
 	self.surviveBonus = 0
 	self.score.killsMultiplier = 1
@@ -32,6 +34,10 @@ if SERVER then
 		if not isRoleChange then return end
 		ply:GiveEquipmentWeapon("weapon_ttt_maid_knife")
 	end
+end
+
+function ROLE:SetUnknownTeam(value)
+	self.unknownTeam = value
 end
 
 function ROLE:AddToSettingsMenu(parent)
@@ -99,21 +105,45 @@ if SERVER then
 		LANG.Msg(rec, "maid_paid_by", { name = send:Nick() }, MSG_MSTACK_ROLE)
 		if rec.maid_owner == nil then
 			rec.maid_owner = send
-			rec:UpdateTeam(send:GetRealTeam(), false, false)
+			local newTeam = send:GetRealTeam()
+			rec:UpdateTeam(newTeam, false, false)
 			LANG.Msg(rec, "maid_work_1", {}, MSG_MSTACK_ROLE)
 			-- defective
-			if owner.maid_owner:GetSubRole() == ROLE_DEFECTIVE then
+			if send:GetSubRole() == ROLE_DEFECTIVE then
 				LANG.Msg(rec, "maid_secondary_def", {}, MSG_MSTACK_ROLE)
 			-- traitor team
-			elseif owner.maid_owner:HasEvilTeam() then
+			elseif send:HasEvilTeam() then
 				LANG.Msg(rec, "maid_secondary_traitor", {}, MSG_MSTACK_ROLE)
 			-- any other team
-			elseif owner:GetTeam() ~= TEAM_NONE then
+			elseif send:GetTeam() ~= TEAM_NONE then
 				LANG.Msg(rec, "maid_secondary_inno", {}, MSG_MSTACK_ROLE)
 			end
-			net.Start("ttt2_maid_thermalvis")
-			net.WritePlayer(send)
-			net.Send()
+
+			if rec:HasEvilTeam() then
+				rec:GetSubRoleData():SetUnknownTeam(false)
+			end
+
+			-- Always show master to maid
+			local marker = send:AddMarkerVision("maid_master")
+			marker:SetVisibleFor(VISIBLE_FOR_PLAYER)
+			marker:SetColor(color)
+			marker:SetOwner(rec)
+			marker:SyncToClients()
+
+			-- Send maid to all team members
+			local filter = RecipientFilter()
+			for _,ply in ipairs(player.GetAll()) do
+				if ply:GetRealTeam() == newTeam then
+					filter:AddPlayer(ply)
+				end
+			end
+			net.Start("ttt2_maid_update")
+			net.WritePlayer(rec)
+			net.WriteString(newTeam)
+			net.Send(filter)
+
+			SendFullStateUpdate()
+			timer.Simple(0.1, SendFullStateUpdate)
 		else
 			LANG.Msg(rec, "maid_work_2", {}, MSG_MSTACK_ROLE)
 			if (GetConVar("ttt2_maid_refund_credits"):GetBool()) then
@@ -124,12 +154,16 @@ if SERVER then
 
 	local round_running = false;
 
-	hook.Add("TTTBeginRound", "Maid_Cleanup", function ()
+	hook.Add("TTT2PreBeginRound", "Maid_Cleanup", function ()
+		local role = roles.GetStored("maid")
+		role.unknownTeam = true
+
 		for i,ply in ipairs(player.GetAll()) do
 			ply.maid_owner = nil
 		end
+
 		round_running = true;
-		timer.Create("notify_maids", 5, -1, function ()
+		timer.Create("notify_maids", 10, -1, function ()
 			if round_running then
 				for _,ply in ipairs(player.GetAll()) do
 					if ply.maid_owner ~= nil then
@@ -145,20 +179,18 @@ if SERVER then
 
 	hook.Add("TTTEndRound", "EndRound_SetState", function ()
 		round_running = false
+		for _,ply in ipairs(player.GetAll()) do
+			ply:RemoveMarkerVision("maid_master")
+		end
 	end)
 end
 
 if CLIENT then
-	net.Receive("ttt2_maid_thermalvis", function ()
-		local master = net.ReadPlayer()
-		LocalPlayer().thermalvis = master
-		thermalvision.Add({master}, THERMALVISION_MODE_BOTH)
-	end)
-
-	hook.Add("TTTEndRound", "EndRound_ClearThermalVis",  function()
-		if LocalPlayer().thermalvis ~= nil then
-			thermalvision.Remove({LocalPlayer().thermalvis})
+	net.Receive("ttt2_maid_update", function()
+		local maid = net.ReadPlayer()
+		local newTeam = net.ReadString()
+		if IsValid(maid) then
+			maid:UpdateTeam(newTeam, false, false)
 		end
-		thermalvision.Clear()
 	end)
 end
