@@ -94,6 +94,17 @@ hook.Add("TTT2CanTransferCredits", "Maid_Payment_Check", function(send, rec, cre
 	end
 end)
 
+
+local round_running = false;
+
+hook.Add("TTTBeginRound", "MaidBeginRound", function ()
+	round_running = true;
+end)
+
+hook.Add("TTTEndRound", "MaidEndRound", function ()
+	round_running = false;
+end)
+
 if SERVER then
 	hook.Add("TTT2OnTransferCredits", "Maid_Payment", function (send, rec, creds, isDead)
 		-- check role
@@ -152,8 +163,6 @@ if SERVER then
 		end
 	end)
 
-	local round_running = false;
-
 	hook.Add("TTT2PreBeginRound", "Maid_Cleanup", function ()
 		local role = roles.GetStored("maid")
 		role.unknownTeam = true
@@ -162,7 +171,6 @@ if SERVER then
 			ply.maid_owner = nil
 		end
 
-		round_running = true;
 		timer.Create("notify_maids", 10, -1, function ()
 			if round_running then
 				for _,ply in ipairs(player.GetAll()) do
@@ -178,7 +186,6 @@ if SERVER then
 	end)
 
 	hook.Add("TTTEndRound", "EndRound_SetState", function ()
-		round_running = false
 		for _,ply in ipairs(player.GetAll()) do
 			ply:RemoveMarkerVision("maid_master")
 		end
@@ -192,5 +199,17 @@ if CLIENT then
 		if IsValid(maid) then
 			maid:UpdateTeam(newTeam, false, false)
 		end
+	end)
+
+	hook.Add("TTT2UpdateTeam", "MaidTablistFix", function(ply, old, new)
+		local lply = LocalPlayer()
+		if not IsValid(ply)
+		or not IsValid(lply)
+		or ply:GetSubRole() ~= ROLE_MAID
+		or lply:HasEvilTeam()
+		or not round_running
+		then return end
+
+		ply:UpdateTeam(old, false, false)
 	end)
 end
