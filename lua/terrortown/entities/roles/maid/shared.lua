@@ -193,6 +193,8 @@ if SERVER then
 end
 
 if CLIENT then
+	local once = false
+
 	net.Receive("ttt2_maid_update", function()
 		local maid = net.ReadPlayer()
 		local newTeam = net.ReadString()
@@ -202,6 +204,11 @@ if CLIENT then
 	end)
 
 	hook.Add("TTT2UpdateTeam", "MaidTablistFix", function(ply, old, new)
+		if once then
+			once = false
+			return
+		end
+
 		local lply = LocalPlayer()
 		if not IsValid(ply)
 		or not IsValid(lply)
@@ -210,6 +217,7 @@ if CLIENT then
 		or not round_running
 		then return end
 
+		once = true
 		ply:UpdateTeam(old, false, false)
 	end)
 end
